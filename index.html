@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f3d3a">
+<title>حجز موعد</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
+<script>
+/* ============ رابط Web App الخاص بسكربت الحجز (يضعه برنامج الإدارة تلقائياً) ============ */
+const API_URL = 'https://script.google.com/macros/s/AKfycbyTC8rU1idz5CmNEPOu67nM3kSD6eGi5fdxd08n5tgc5qq_OMVue-746RbxCF-KS0dB1Q/exec';
+</script>
+<style>
+:root{--bg:#f3f5f4;--card:#fff;--ink:#14211f;--mut:#5f6f6c;--line:#dfe6e4;--pri:#0f6b5f;--pri2:#0f3d3a;--priSoft:#e3f1ee;
+  --acc:#d98a1c;--accSoft:#fdf3e2;--ok:#1f8a4c;--okSoft:#e4f4ea;--bad:#c0392b;--badSoft:#fbeae8;--wa:#1fa855;--r:16px;--sh:0 1px 2px rgba(0,0,0,.05),0 6px 18px rgba(0,0,0,.06)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0e1514;--card:#162120;--ink:#e6efed;--mut:#93a5a1;--line:#263533;
+  --pri:#2bb39f;--pri2:#0b2523;--priSoft:#173431;--acc:#f0a63a;--accSoft:#3a2c14;--okSoft:#15301f;--badSoft:#3a1d1a;--sh:none}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Arabic",Tahoma,system-ui,sans-serif;font-size:15px}
+button,input,select,textarea{font:inherit;color:inherit}
+header.top{position:sticky;top:0;z-index:20;background:var(--pri2);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:10px}
+header.top img{width:40px;height:40px;border-radius:11px;background:#fff;object-fit:contain;padding:2px;flex:none}
+header.top .tx{flex:1;min-width:0}header.top .t{font-weight:700;font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header.top .s{font-size:12px;opacity:.8;margin-top:1px;display:flex;gap:6px;align-items:center}
+.dot{width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block}.dot.off{background:#f87171}
+.wa{background:var(--wa);border:0;color:#fff;border-radius:12px;padding:8px 11px;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;text-decoration:none;flex:none}
+main{max-width:720px;margin:0 auto;padding:14px 16px 110px}
+nav.tabs{position:fixed;bottom:0;left:0;right:0;z-index:20;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs button{flex:1;border:0;background:none;padding:11px 2px;font-size:13.5px;color:var(--mut);cursor:pointer}
+nav.tabs button.act{color:var(--pri);font-weight:700;box-shadow:inset 0 3px 0 var(--pri)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;box-shadow:var(--sh);margin-bottom:12px}
+.step{display:flex;align-items:center;gap:8px;margin:0 0 12px;font-weight:700}
+.step i{font-style:normal;width:24px;height:24px;border-radius:50%;background:var(--pri);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:none}
+.svcs{display:grid;gap:8px}@media(min-width:560px){.svcs{grid-template-columns:1fr 1fr}}
+.svc{border:1.5px solid var(--line);background:var(--bg);border-radius:14px;padding:11px 12px;cursor:pointer;text-align:right;display:flex;flex-direction:column;gap:4px}
+.svc b{font-size:14.5px}.svc small{color:var(--mut);font-size:12.5px;line-height:1.5}
+.svc .m{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.tag{font-size:11.5px;padding:2px 8px;border-radius:99px;background:var(--card);border:1px solid var(--line);color:var(--mut)}
+.svc.act{border-color:var(--pri);background:var(--priSoft)}.svc.act .tag{border-color:transparent}
+.days{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x mandatory}
+.day{flex:0 0 74px;scroll-snap-align:start;border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:8px 4px;text-align:center;cursor:pointer}
+.day b{display:block;font-size:22px;line-height:1.2}.day small{display:block;font-size:11.5px;color:var(--mut)}
+.day.act{background:var(--pri);border-color:var(--pri);color:#fff}.day.act small{color:rgba(255,255,255,.85)}
+.day:disabled{opacity:.45;cursor:not-allowed}
+.times{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}@media(min-width:520px){.times{grid-template-columns:repeat(3,1fr)}}
+.time{border:1px solid var(--line);background:var(--bg);border-radius:11px;padding:10px 4px;text-align:center;cursor:pointer;font-variant-numeric:tabular-nums;font-size:14px}
+.time.act{background:var(--pri);border-color:var(--pri);color:#fff;font-weight:700}
+.time:disabled{opacity:.38;text-decoration:line-through;cursor:not-allowed}
+label{display:block;font-size:12.5px;color:var(--mut);margin:0 0 4px}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 11px;outline:none}
+input:focus,textarea:focus{border-color:var(--pri)}
+.f{margin-bottom:10px}.f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{border:0;border-radius:12px;padding:11px 16px;background:var(--pri);color:#fff;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+.btn.sec{background:var(--priSoft);color:var(--pri)}.btn.bad{background:var(--badSoft);color:var(--bad)}.btn.green{background:var(--wa)}
+.btn.sm{padding:6px 10px;font-size:13px;border-radius:9px}.btn.wide{width:100%}.btn:disabled{opacity:.5;cursor:not-allowed}
+.bar{position:fixed;left:0;right:0;bottom:calc(46px + env(safe-area-inset-bottom));z-index:15;padding:10px 16px;background:linear-gradient(transparent,var(--bg) 28%)}
+.bar .in{max-width:688px;margin:0 auto}.sum{font-size:13px;color:var(--mut);margin-bottom:6px;text-align:center}
+.note{border-radius:12px;padding:10px 12px;font-size:13.5px;margin-bottom:12px;line-height:1.7}
+.note.warn{background:var(--accSoft);color:var(--acc)}.note.info{background:var(--priSoft);color:var(--pri)}
+.empty{text-align:center;color:var(--mut);padding:26px 10px}
+.bk{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px}
+.bk .h{display:flex;align-items:center;gap:8px}.bk .h b{flex:1}.bk .m{font-size:13px;color:var(--mut);margin-top:4px;line-height:1.7}
+.badge{font-size:11.5px;padding:3px 9px;border-radius:99px;font-weight:600;white-space:nowrap}
+.st-pending{background:var(--accSoft);color:var(--acc)}.st-confirmed{background:var(--priSoft);color:var(--pri)}
+.st-done{background:var(--okSoft);color:var(--ok)}.st-cancelled,.st-noshow{background:var(--badSoft);color:var(--bad)}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center}
+@media(min-width:700px){.modal{align-items:center}}
+.sheet{background:var(--card);width:100%;max-width:520px;max-height:92vh;overflow:auto;border-radius:20px 20px 0 0;padding:20px 16px calc(18px + env(safe-area-inset-bottom))}
+@media(min-width:700px){.sheet{border-radius:20px}}
+.big{font-size:30px;font-weight:700;letter-spacing:4px;text-align:center;color:var(--pri);margin:4px 0 10px;direction:ltr}
+.ok-ic{width:58px;height:58px;border-radius:50%;background:var(--okSoft);color:var(--ok);display:flex;align-items:center;justify-content:center;margin:0 auto 8px}
+.toast{position:fixed;bottom:calc(160px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;z-index:99;font-size:14px;max-width:90vw;text-align:center}
+.spin{width:24px;height:24px;border:3px solid var(--line);border-top-color:var(--pri);border-radius:50%;animation:sp .8s linear infinite;margin:30px auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+.rowx{display:flex;gap:8px}
+</style>
+</head>
+<body>
+<header class="top"><img id="logo" src="icon-192.png" alt=""><div class="tx"><div class="t" id="bname">حجز موعد</div><div class="s"><span class="dot" id="dot"></span><span id="net"></span></div></div>
+ <a class="wa" id="waBtn" target="_blank" href="#" hidden><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.2z"/></svg>واتساب</a></header>
+<main id="view"></main>
+<div id="barWrap"></div>
+<nav class="tabs" id="tabs"></nav>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const digits=s=>String(s||'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/\D/g,'');
+const LS={get(k,d){try{const v=localStorage.getItem('bk_'+k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{localStorage.setItem('bk_'+k,JSON.stringify(v))}catch{}}};
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),3200)}
+const dObj=d=>new Date(d+'T12:00:00');
+const fDay=d=>new Intl.DateTimeFormat('ar-IQ-u-nu-latn',{weekday:'long'}).format(dObj(d));
+const fMon=d=>new Intl.DateTimeFormat('ar-IQ-u-nu-latn',{month:'long'}).format(dObj(d));
+const fDate=d=>`${fDay(d)} ${dObj(d).getDate()} ${fMon(d)}`;
+const fTime=t=>{if(!t)return '';let[h,m]=t.split(':').map(Number);const p=h<12?'ص':'م';h=h%12||12;return `${h}:${String(m).padStart(2,'0')} ${p}`};
+const addMin=(t,d)=>{const[h,m]=t.split(':').map(Number);const x=h*60+m+(+d||0);return String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%60).padStart(2,'0')};
+const fDur=m=>{m=+m;if(m<60)return m+' دقيقة';const h=m/60;return h===1?'ساعة':h===2?'ساعتان':Number.isInteger(h)?(h<=10?h+' ساعات':h+' ساعة'):`${Math.floor(h)}:${String(m%60).padStart(2,'0')} ساعة`};
+const fMoney=n=>Number(n).toLocaleString('en-US')+' د.ع';
+const todayStr=()=>{const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const waNum=p=>{let n=digits(p);if(n.startsWith('0'))n='964'+n.slice(1);return n};
+const ST={pending:'بانتظار التأكيد',confirmed:'مؤكد',done:'تم',cancelled:'ملغى',noshow:'لم يحضر'};
+
+async function api(action,data={}){
+  if(!navigator.onLine)throw new Error('لا يوجد اتصال بالإنترنت');
+  const r=await fetch(API_URL,{method:'POST',body:JSON.stringify({action,...data})});
+  const j=await r.json();if(!j.ok&&!j.taken)throw new Error(j.error||'خطأ في الخادم');return j}
+
+/* ============ الحالة ============ */
+let cfg=LS.get('cfg2',null),loading=false,route='book';
+let sel={service:'',date:'',time:''};
+let me=LS.get('me',{name:'',phone:'',address:''});
+let mine=LS.get('mine',[]);
+
+function setNet(){const on=navigator.onLine;$('#dot').className='dot'+(on?'':' off');$('#net').textContent=on?'متصل':'غير متصل — المعروض آخر مواعيد محفوظة'}
+addEventListener('online',()=>{setNet();refresh()});addEventListener('offline',()=>{setNet();render()});
+function brand(){const s=cfg?.settings;$('#bname').textContent=s?.businessName||'حجز موعد';
+  const logo=LS.get('logo',null);$('#logo').src=logo?.data||'icon-192.png';
+  const wa=s?.whatsapp||s?.phone;const b=$('#waBtn');if(wa){b.hidden=false;b.href=`https://wa.me/${waNum(wa)}?text=${encodeURIComponent('مرحباً، أود الاستفسار عن ')}`}}
+
+async function refresh(silent){if(loading)return;loading=true;if(!cfg)render();
+  try{const logo=LS.get('logo',null);const j=await api('config',{logoVer:logo?.ver||''});
+    if('logo' in j)LS.set('logo',{ver:j.logoVer,data:j.logo||''});
+    cfg={settings:j.settings,avail:j.avail,at:Date.now()};LS.set('cfg2',cfg);
+    if(sel.service&&!cfg.settings.services.some(s=>s.name===sel.service))sel={service:'',date:'',time:''};
+    const days=cfg.avail?.[sel.service]||[];
+    if(sel.date&&!days.some(d=>d.date===sel.date)){sel.date='';sel.time=''}
+    const day=days.find(d=>d.date===sel.date);if(sel.time&&!(day&&day.slots.some(s=>s.time===sel.time&&s.free)))sel.time='';
+  }catch(e){if(!silent)toast(e.message)}finally{loading=false;render()}}
+
+/* ============ العرض ============ */
+function render(){
+  if(route==='book')keepForm();
+  const ae=document.activeElement,fid=ae&&ae.id&&/INPUT|TEXTAREA/.test(ae.tagName)?ae.id:null,pos=fid&&ae.type!=='date'?ae.selectionStart:null;
+  brand();
+  $('#tabs').innerHTML=[['book','احجز موعد'],['mine','حجوزاتي'+(mineUp().length?` (${mineUp().length})`:'')]].map(([k,l])=>`<button data-go="${k}" class="${route===k?'act':''}">${l}</button>`).join('');
+  $('#view').innerHTML=route==='book'?vBook():vMine();
+  $('#barWrap').innerHTML=route==='book'&&cfg?bar():'';
+  if(fid){const el=document.getElementById(fid);if(el){el.focus();if(pos!=null)try{el.setSelectionRange(pos,pos)}catch{}}}
+}
+function go(r){keepForm();route=r;render();scrollTo(0,0);if(r==='mine')loadMine()}
+const svcOf=n=>cfg?.settings?.services?.find(s=>s.name===n);
+
+function vBook(){
+  if(!cfg)return loading?'<div class="spin"></div>':`<div class="empty">تعذر تحميل المواعيد.<br><br><button class="btn" data-act="refresh">إعادة المحاولة</button></div>`;
+  const s=cfg.settings,sv=svcOf(sel.service),days=sv?(cfg.avail?.[sv.name]||[]):[],day=days.find(d=>d.date===sel.date);
+  return `${!navigator.onLine?`<div class="note warn">أنت غير متصل بالإنترنت. يمكنك تصفح آخر مواعيد محفوظة، والحجز يحتاج اتصالاً.</div>`:''}
+  <div class="card"><div class="step"><i>1</i>اختر الخدمة</div><div class="svcs">
+   ${s.services.map(x=>`<button class="svc ${sel.service===x.name?'act':''}" data-act="svc" data-v="${esc(x.name)}"><b>${esc(x.name)}</b>${x.desc?`<small>${esc(x.desc)}</small>`:''}
+    <span class="m"><span class="tag">⏱ ${fDur(x.duration)}</span><span class="tag">${+x.price?'السعر التقريبي '+fMoney(x.price):'السعر حسب الكشف'}</span></span></button>`).join('')}</div></div>
+  ${sv?`<div class="card" id="dayCard"><div class="step"><i>2</i>اختر اليوم</div>
+   ${days.length?`<div class="days">${days.map(d=>{const free=d.slots.filter(x=>x.free).length;const dt=dObj(d.date);
+     return `<button class="day ${sel.date===d.date?'act':''}" data-act="day" data-v="${d.date}" ${free?'':'disabled'}><small>${d.date===todayStr()?'اليوم':fDay(d.date)}</small><b>${dt.getDate()}</b><small>${free?free+' متاح':'ممتلئ'}</small></button>`}).join('')}</div>`
+   :'<div class="empty">لا توجد أيام متاحة لهذه الخدمة حالياً. تواصل معنا على واتساب.</div>'}</div>`:''}
+  ${day?`<div class="card" id="timeCard"><div class="step"><i>3</i>اختر الوقت · ${fDate(day.date)}</div>
+   <div class="times">${day.slots.map(x=>`<button class="time ${sel.time===x.time?'act':''}" data-act="time" data-v="${x.time}" ${x.free?'':'disabled'}>${fTime(x.time)} – ${fTime(addMin(x.time,sv.duration))}</button>`).join('')}</div></div>`:''}
+  <div class="card"><div class="step"><i>${sv?4:2}</i>بياناتك</div>
+   <div class="f"><label>الاسم *</label><input id="b_name" value="${esc(me.name)}" autocomplete="name"></div>
+   <div class="f"><label>رقم الهاتف *</label><input id="b_phone" inputmode="tel" dir="ltr" style="text-align:right" placeholder="07xxxxxxxxx" value="${esc(me.phone)}" autocomplete="tel"></div>
+   <div class="f"><label>العنوان / المنطقة</label><input id="b_addr" value="${esc(me.address)}"></div>
+   <div class="f"><label>موقعك على الخريطة (يفيد في الزيارة الموقعية)</label>
+    <div class="rowx"><input id="b_loc" dir="ltr" placeholder="اختياري" value="${esc(sel.loc||'')}"><button class="btn sec" data-act="loc" type="button">موقعي</button></div></div>
+   <div class="f"><label>ملاحظات (حجم المنظومة، نوع المشكلة…)</label><textarea id="b_note" rows="2">${esc(sel.note||'')}</textarea></div></div>
+  ${s.phone?`<div class="empty" style="padding:6px">للاستفسار: <a href="tel:${esc(s.phone)}" style="color:var(--pri)">${esc(s.phone)}</a>${s.address?' · '+esc(s.address):''}</div>`:''}
+  <div style="height:90px"></div>`}
+function bar(){const ok=sel.service&&sel.date&&sel.time;const sv=svcOf(sel.service);
+  return `<div class="bar"><div class="in"><div class="sum">${ok?`${esc(sel.service)} · ${fDate(sel.date)} · ${fTime(sel.time)}${+sv?.price?' · '+fMoney(sv.price):''}`:'اختر الخدمة واليوم والوقت'}</div>
+   <button class="btn wide" data-act="book" ${ok&&navigator.onLine?'':'disabled'}>${navigator.onLine?'تأكيد الحجز':'الحجز يحتاج إنترنت'}</button></div></div>`}
+function keepForm(){if(!$('#b_name'))return;me={name:$('#b_name').value.trim(),phone:$('#b_phone').value.trim(),address:$('#b_addr').value.trim()};
+  sel.loc=$('#b_loc').value.trim();sel.note=$('#b_note').value.trim();LS.set('me',me)}
+async function book(){keepForm();
+  if(!me.name)return toast('أدخل الاسم');if(digits(me.phone).length<10)return toast('أدخل رقم هاتف صحيح');
+  const b=$('[data-act=book]');b.disabled=true;b.textContent='جارٍ الحجز…';
+  try{const j=await api('book',{service:sel.service,date:sel.date,time:sel.time,name:me.name,phone:me.phone,address:me.address,location:sel.loc||'',note:sel.note||''});
+    if(j.taken){cfg.avail=j.avail;cfg.at=Date.now();LS.set('cfg2',cfg);sel.time='';render();return toast(j.error)}
+    mine=[j.booking,...mine.filter(x=>x.id!==j.booking.id)];LS.set('mine',mine);
+    const done=j.booking;sel={service:'',date:'',time:''};refresh(true);showDone(done)}
+  catch(e){toast(e.message);render()}}
+function showDone(b){const s=cfg.settings;
+  const msg=`مرحباً، حجزت موعداً:\n${b.service}\n${fDate(b.date)} الساعة ${fTime(b.time)}\nالاسم: ${b.name}\nرمز الحجز: ${b.code}`;
+  modal(`<div class="ok-ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5 9-10"/></svg></div>
+   <h3 style="text-align:center;margin:0">تم إرسال طلب الحجز</h3>
+   <div class="empty" style="padding:8px">${esc(b.service)}<br><b>${fDate(b.date)} · ${fTime(b.time)} – ${fTime(b.endTime)}</b></div>
+   <div style="text-align:center;font-size:13px;color:var(--mut)">رمز الحجز</div><div class="big">${esc(b.code)}</div>
+   <div class="note info">سنراجع الطلب ونؤكد الموعد معك. تستطيع متابعة حالته من «حجوزاتي».</div>
+   <div class="rowx">${s.whatsapp||s.phone?`<a class="btn green" style="flex:1" target="_blank" href="https://wa.me/${waNum(s.whatsapp||s.phone)}?text=${encodeURIComponent(msg)}">إرسال عبر واتساب</a>`:''}<button class="btn" style="flex:1" data-act="closeGoMine">حجوزاتي</button></div>`)}
+
+/* ============ حجوزاتي ============ */
+const mineUp=()=>{const t=todayStr();return mine.filter(b=>b.date>=t&&['pending','confirmed'].includes(b.status))};
+async function loadMine(){if(!mine.length||!navigator.onLine)return;
+  try{const j=await api('mine',{ids:mine.map(x=>x.id)});const m=new Map(j.bookings.map(b=>[b.id,b]));
+    mine=mine.map(x=>m.get(x.id)||x);LS.set('mine',mine);if(route==='mine')render()}catch{}}
+function vMine(){const up=mineUp().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  const past=mine.filter(b=>!up.includes(b)).sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
+  const card=b=>`<div class="bk"><div class="h"><b>${esc(b.service)}</b><span class="badge st-${b.status}">${ST[b.status]||b.status}</span></div>
+   <div class="m">${fDate(b.date)} · ${fTime(b.time)}${b.endTime?' – '+fTime(b.endTime):''}<br>رمز الحجز: <b dir="ltr">${esc(b.code)}</b></div>
+   ${up.includes(b)?`<div class="rowx" style="margin-top:8px"><button class="btn bad sm" data-act="cancel" data-id="${b.id}">إلغاء الحجز</button></div>`:''}</div>`;
+  return `<h3 style="margin:4px 0 10px">مواعيدي القادمة</h3>${up.length?up.map(card).join(''):'<div class="empty">لا توجد مواعيد قادمة.</div>'}
+  ${past.length?`<h3 style="margin:18px 0 10px">السابقة</h3>${past.slice(0,20).map(card).join('')}`:''}
+  <div class="card" style="margin-top:16px"><div class="step">استرجاع حجز من جهاز آخر</div>
+   <div class="f2"><input id="r_code" placeholder="رمز الحجز" dir="ltr"><input id="r_phone" placeholder="رقم الهاتف" inputmode="tel" dir="ltr"></div>
+   <button class="btn sec wide" style="margin-top:8px" data-act="recover">استرجاع</button></div>`}
+async function cancelMine(id){if(!confirm('هل تريد إلغاء هذا الحجز؟'))return;const b=mine.find(x=>x.id===id);
+  try{await api('cancel',{id,code:b?.code});mine=mine.map(x=>x.id===id?{...x,status:'cancelled'}:x);LS.set('mine',mine);render();refresh(true);toast('تم إلغاء الحجز')}catch(e){toast(e.message)}}
+async function recover(){const code=$('#r_code').value.trim(),phone=$('#r_phone').value.trim();if(!code||!phone)return toast('أدخل الرمز ورقم الهاتف');
+  try{const j=await api('mine',{code,phone,ids:[]});if(!j.bookings.length)return toast('لم يتم العثور على حجز');
+    j.bookings.forEach(b=>{mine=[b,...mine.filter(x=>x.id!==b.id)]});LS.set('mine',mine);render();toast('تم الاسترجاع')}catch(e){toast(e.message)}}
+
+/* ============ أحداث ============ */
+function modal(body){closeModal();const m=document.createElement('div');m.className='modal';m.id='modal';m.innerHTML=`<div class="sheet">${body}</div>`;
+  m.onclick=e=>{if(e.target===m)closeModal()};document.body.appendChild(m)}
+function closeModal(){$('#modal')?.remove()}
+document.addEventListener('click',e=>{
+  const g=e.target.closest('[data-go]');if(g)return go(g.dataset.go);
+  const b=e.target.closest('[data-act]');if(!b)return;const d=b.dataset;
+  switch(d.act){
+   case 'refresh':return refresh();
+   case 'svc':keepForm();if(sel.service!==d.v)sel={...sel,service:d.v,date:'',time:''};render();return $('#dayCard')?.scrollIntoView({behavior:'smooth',block:'center'});
+   case 'day':keepForm();sel.date=d.v;sel.time='';render();return $('#timeCard')?.scrollIntoView({behavior:'smooth',block:'center'});
+   case 'time':keepForm();sel.time=d.v;return render();
+   case 'loc':if(!navigator.geolocation)return toast('الموقع غير مدعوم');b.textContent='…';
+     navigator.geolocation.getCurrentPosition(p=>{$('#b_loc').value=`https://maps.google.com/?q=${p.coords.latitude.toFixed(6)},${p.coords.longitude.toFixed(6)}`;b.textContent='✓';keepForm()},
+      ()=>{b.textContent='موقعي';toast('لم يتم السماح بالوصول للموقع')},{enableHighAccuracy:true,timeout:15000});return;
+   case 'book':return book();
+   case 'closeGoMine':closeModal();return go('mine');
+   case 'cancel':return cancelMine(d.id);
+   case 'recover':return recover();
+  }});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh(true)});
+setNet();render();refresh(true);loadMine();
+setInterval(()=>{if(!document.hidden&&route==='book')refresh(true)},60000);
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
